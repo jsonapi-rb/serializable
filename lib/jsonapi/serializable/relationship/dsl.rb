@@ -20,11 +20,11 @@ module JSONAPI
             elsif resources.respond_to?(:to_ary)
               Array(resources).map do |obj|
                 @_class[obj.class.name.to_sym]
-                  .new(@_exposures.merge(object: obj))
+                  .new(obj, @_exposures)
               end
             else
               @_class[resources.class.name.to_sym]
-                .new(@_exposures.merge(object: resources))
+                .new(resources, @_exposures)
             end
           end
         end

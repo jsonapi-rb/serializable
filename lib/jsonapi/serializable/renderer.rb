@@ -85,7 +85,7 @@ module JSONAPI
 
       # @api private
       def _build(object, exposures, klass)
-        klass[object.class.name.to_sym].new(exposures.merge(object: object))
+        klass[object.class.name.to_sym].new(object, exposures)
       end
     end
   end

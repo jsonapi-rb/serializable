@@ -15,7 +15,8 @@ module JSONAPI
       id { @object.public_send(:id).to_s }
 
       # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
-      def initialize(exposures = {})
+      def initialize(object, exposures = {})
+        @object = object
         @_exposures = exposures
         @_exposures.each { |k, v| instance_variable_set("@#{k}", v) }
 
@@ -28,7 +29,7 @@ module JSONAPI
         @_relationships = self.class.relationship_blocks
                               .each_with_object({}) do |(k, v), h|
           opts = self.class.relationship_options[k] || {}
-          h[k] = Relationship.new(@_exposures, opts, &v)
+          h[k] = Relationship.new(@object, @_exposures, opts, &v)
         end
         @_meta = if (b = self.class.meta_block)
                    instance_eval(&b)
