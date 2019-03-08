@@ -28,6 +28,7 @@ module JSONAPI
         @_relationships = self.class.relationship_blocks
                               .each_with_object({}) do |(k, v), h|
           opts = self.class.relationship_options[k] || {}
+          opts = opts.merge(_resource: self)
           h[k] = Relationship.new(@_exposures, opts, &v)
         end
         @_meta = if (b = self.class.meta_block)

@@ -45,6 +45,18 @@ module JSONAPI
 
         resources.respond_to?(:each) ? linkage_data : linkage_data.first
       end
+
+      def respond_to_missing?(m, include_private = false)
+        @_options[:_resource].respond_to?(m) || super
+      end
+
+      def method_missing(m, *args, &block)
+        if @_options[:_resource].respond_to?(m, true)
+          @_options[:_resource].send(m, *args, &block)
+        else
+          super
+        end
+      end
     end
   end
 end

@@ -1,8 +1,11 @@
 require 'spec_helper'
 
 describe JSONAPI::Serializable::Resource, '.relationship' do
-  let(:posts) { [Post.new(id: 1), Post.new(id: 2)] }
-  let(:user) { User.new(id: 'foo', posts: posts) }
+  let(:posts) do
+    [Post.new(id: 1, title: 'Post 1'),
+     Post.new(id: 2, title: 'Post 2')]
+  end
+  let(:user) { User.new(id: 'foo', name: 'Lucas', posts: posts) }
 
   it 'forwards to @object by default' do
     klass = Class.new(JSONAPI::Serializable::Resource) do
@@ -108,5 +111,28 @@ describe JSONAPI::Serializable::Resource, '.relationship' do
     }
 
     expect(actual).to eq(expected)
+  end
+
+  it 'forwards missing methods to parent resource if available' do
+    klass = Class.new(JSONAPI::Serializable::Resource) do
+      type 'users'
+
+      attribute(:name) { "#{@object.name} - writer of #{primary_post.title}" }
+
+      has_one :primary_post do
+        data { primary_post }
+      end
+
+      private
+
+      def primary_post
+        @object.posts.first
+      end
+    end
+
+    resource = klass.new(object: user, _class: { Post: SerializablePost })
+    actual = resource.as_jsonapi(include: [:primary_post])
+    expect(actual[:attributes][:name]).to eq('Lucas - writer of Post 1')
+    expect(actual[:relationships][:primary_post][:data][:id]).to eq('1')
   end
 end
