@@ -22,14 +22,16 @@ module JSONAPI
         end
 
         def self.extended(klass)
-          klass.class_eval do
-            include InstanceMethods
+          klass.module_eval do
+            prepend InstanceMethods
+
             class << self
               attr_accessor :field_condition_blocks
               attr_accessor :link_condition_blocks
             end
             self.field_condition_blocks ||= {}
             self.link_condition_blocks  ||= {}
+
           end
         end
 
@@ -48,6 +50,8 @@ module JSONAPI
           super
           _register_condition(field_condition_blocks, name, options)
         end
+
+
 
         # Handle the `if` and `unless` options for relationships (has_one,
         #   belongs_to, has_many).
