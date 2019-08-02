@@ -78,9 +78,7 @@ module JSONAPI
       end
 
       def jsonapi_cache_key(options)
-        "#{jsonapi_type} - #{jsonapi_id}" \
-        "- #{options[:include].to_a.sort}" \
-        "- #{(options[:fields] || Set.new).to_a.sort}"
+        "#{jsonapi_type}@#{jsonapi_id}@#{options[:include]}@#{options[:fields]}"
       end
 
       private
